@@ -20,6 +20,7 @@ interface StyleRow {
   depletion_rate: number;
   depletion_rate_3m: number | null;
   first_sale_date: string | null;
+  days_since_first_sale: number | null;
   needs_qr: boolean;
   qr_reason: string;
 }
@@ -69,13 +70,15 @@ function DepletionBar({ rate, rate3m }: { rate: number; rate3m: number | null })
   );
 }
 
-function QRBadge({ reason }: { reason: string }) {
-  if (!reason || reason === "normal" || reason === "no_sales" || reason === "soldout" || reason === "season_end") return null;
-  return (
-    <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">
-      🔴 QR 필요
-    </span>
-  );
+function SalesBadge({ days, rate }: { days: number | null; rate: number }) {
+  if (days === null || days < 7) {
+    return <span className="text-gray-300 text-xs">-</span>;
+  }
+  const isRed    = (days >= 7  && rate >= 5)  || (days >= 14 && rate >= 10);
+  const isYellow = (days >= 7  && rate >= 4)  || (days >= 14 && rate >= 8);
+  if (isRed)    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">🔴 QR 필요</span>;
+  if (isYellow) return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">🟡 주의</span>;
+  return          <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-600">🟢 양호</span>;
 }
 
 export default function DepletionPage() {
@@ -230,7 +233,7 @@ export default function DepletionPage() {
                   <th className={thClass} onClick={() => handleSort("depletion_rate_3m")}>
                     <span className="text-emerald-600">3개월 소진율{sortIcon("depletion_rate_3m")}</span>
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">QR</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">판매 상태</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -276,7 +279,7 @@ export default function DepletionPage() {
                         </div>
                       ) : <span className="text-gray-300 text-xs">-</span>}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap"><QRBadge reason={d.qr_reason} /></td>
+                    <td className="px-4 py-3 whitespace-nowrap"><SalesBadge days={d.days_since_first_sale} rate={d.depletion_rate} /></td>
                   </tr>
                 ))}
               </tbody>

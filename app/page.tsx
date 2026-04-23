@@ -14,6 +14,7 @@ interface StyleRow {
   year_code: string;
   season_code: string;
   total_sold: number;
+  sold_1m: number;
   total_remaining: number;
   total_stock: number;
   depletion_rate: number;
@@ -23,7 +24,7 @@ interface StyleRow {
   qr_reason: string;
 }
 
-type SortKey = "depletion_rate" | "depletion_rate_3m" | "total_sold" | "style_code";
+type SortKey = "depletion_rate" | "depletion_rate_3m" | "total_sold" | "sold_1m" | "style_code";
 
 const YEAR_MAP: Record<string, string> = {
   A: "'21", B: "'22", C: "'23", D: "'24", E: "'25", F: "'26",
@@ -86,7 +87,7 @@ export default function DepletionPage() {
   const [category, setCategory] = useState("전체");
   const [yearFilter, setYearFilter] = useState("전체");
   const [seasonFilter, setSeasonFilter] = useState("전체");
-  const [sortKey, setSortKey] = useState<SortKey>("depletion_rate");
+  const [sortKey, setSortKey] = useState<SortKey>("sold_1m");
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
   const [qrOnly, setQrOnly] = useState(false);
 
@@ -137,6 +138,7 @@ export default function DepletionPage() {
       if (sortKey === "style_code") return dir * a.style_code.localeCompare(b.style_code);
       if (sortKey === "depletion_rate_3m") return dir * ((a.depletion_rate_3m ?? 0) - (b.depletion_rate_3m ?? 0));
       if (sortKey === "total_sold") return dir * (a.total_sold - b.total_sold);
+      if (sortKey === "sold_1m") return dir * (a.sold_1m - b.sold_1m);
       return dir * (a.depletion_rate - b.depletion_rate);
     });
   }, [data, search, category, yearFilter, seasonFilter, sortKey, sortDir, qrOnly]);
@@ -153,7 +155,7 @@ export default function DepletionPage() {
   return (
     <div>
       <div className="mb-5">
-        <h1 className="text-2xl font-bold text-gray-800">소진율 대시보드</h1>
+        <h1 className="text-2xl font-bold text-white">소진율 대시보드</h1>
         <p className="text-xs text-gray-400 mt-1">
           소진율 = 판매량 ÷ 입고총량 &nbsp;|&nbsp; 3개월 소진율(초록) = 입고 후 90일 이내 판매량 ÷ 입고총량
         </p>
@@ -218,7 +220,10 @@ export default function DepletionPage() {
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">연도·시즌</th>
                   <th className={thClass} onClick={() => handleSort("style_code")}>스타일코드{sortIcon("style_code")}</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">스타일명</th>
-                  <th className={thClass} onClick={() => handleSort("total_sold")}>판매량{sortIcon("total_sold")}</th>
+                  <th className={thClass} onClick={() => handleSort("sold_1m")}>
+                    <span className={sortKey === "sold_1m" ? "text-indigo-500" : ""}>최근 1개월{sortIcon("sold_1m")}</span>
+                  </th>
+                  <th className={thClass} onClick={() => handleSort("total_sold")}>전체 판매량{sortIcon("total_sold")}</th>
                   <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 whitespace-nowrap">재고수량</th>
                   <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 whitespace-nowrap">입고총량</th>
                   <th className={thClass} onClick={() => handleSort("depletion_rate")}>
@@ -239,6 +244,11 @@ export default function DepletionPage() {
                     <td className="px-4 py-3"><SeasonBadge y={d.year_code} s={d.season_code} /></td>
                     <td className="px-4 py-3 font-mono text-xs text-gray-700">{d.style_code}</td>
                     <td className="px-4 py-3 text-gray-700 max-w-44 truncate">{d.name ?? "-"}</td>
+                    <td className="px-4 py-3 text-right">
+                      <span className={`font-bold ${d.sold_1m > 0 ? "text-indigo-600" : "text-gray-300"}`}>
+                        {d.sold_1m.toLocaleString()}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-right font-semibold text-gray-800">{d.total_sold.toLocaleString()}</td>
                     <td className="px-4 py-3 text-right text-gray-500">{d.total_remaining.toLocaleString()}</td>
                     <td className="px-4 py-3 text-right text-gray-400">{d.total_stock.toLocaleString()}</td>

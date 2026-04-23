@@ -80,7 +80,7 @@ export default function QRPage() {
   return (
     <div>
       <div className="mb-5">
-        <h1 className="text-2xl font-bold text-gray-800">🔴 QR 오더 대시보드</h1>
+        <h1 className="text-2xl font-bold text-white">🔴 QR 오더 대시보드</h1>
         <p className="text-xs text-gray-400 mt-1">
           QR 필요 수량 = 시즌 마감까지 예상 판매량 − 잔여재고 &nbsp;|&nbsp; 예상 필업일 = 오늘 + 60일 (생산 리드타임)
         </p>
@@ -169,7 +169,7 @@ export default function QRPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-gray-700">{d.style_code}</td>
-                      <td className="px-4 py-3 text-gray-700 max-w-40 truncate">{d.name ?? "-"}</td>
+                      <td className="px-4 py-3 text-gray-700 max-w-64 truncate">{d.name ?? "-"}</td>
                       <td className="px-4 py-3 text-right text-gray-500">{d.days_since_first_sale}일</td>
                       <td className="px-4 py-3 text-right font-semibold text-gray-800">{d.daily_avg_sold.toFixed(1)}</td>
                       <td className="px-4 py-3 text-right font-bold text-red-500">{d.depletion_rate.toFixed(1)}%</td>

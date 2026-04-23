@@ -243,7 +243,7 @@ export default function DepletionPage() {
                     </td>
                     <td className="px-4 py-3"><SeasonBadge y={d.year_code} s={d.season_code} /></td>
                     <td className="px-4 py-3 font-mono text-xs text-gray-700">{d.style_code}</td>
-                    <td className="px-4 py-3 text-gray-700 max-w-44 truncate">{d.name ?? "-"}</td>
+                    <td className="px-4 py-3 text-gray-700 max-w-64 truncate">{d.name ?? "-"}</td>
                     <td className="px-4 py-3 text-right">
                       <span className={`font-bold ${d.sold_1m > 0 ? "text-indigo-600" : "text-gray-300"}`}>
                         {d.sold_1m.toLocaleString()}

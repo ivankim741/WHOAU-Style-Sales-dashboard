@@ -28,7 +28,7 @@ interface StyleRow {
 type SortKey = "depletion_rate" | "depletion_rate_3m" | "total_sold" | "sold_1m" | "style_code";
 
 const YEAR_MAP: Record<string, string> = {
-  A: "'21", B: "'22", C: "'23", D: "'24", E: "'25", F: "'26",
+  A: "'21", B: "'22", C: "'23", D: "'24", E: "'25", F: "'26", G: "'26",
 };
 const SEASON_MAP: Record<string, string> = {
   "1": "1Q", "2": "2Q", "3": "3Q", "4": "4Q",

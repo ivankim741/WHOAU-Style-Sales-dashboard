@@ -32,7 +32,7 @@ interface QRStyle {
   qr_rate_30d: number;
 }
 
-const YEAR_MAP: Record<string, string> = { A: "'21", B: "'22", C: "'23", D: "'24", E: "'25", F: "'26", G: "'27" };
+const YEAR_MAP: Record<string, string> = { A: "'21", B: "'22", C: "'23", D: "'24", E: "'25", F: "'26", G: "'26" };
 const SEASON_MAP: Record<string, string> = { "1": "1Q", "2": "2Q", "3": "3Q", "4": "4Q" };
 
 function fmt(dateStr: string) {

@@ -156,7 +156,7 @@ export default function DepletionPage() {
   return (
     <div>
       <div className="mb-5">
-        <h1 className="text-2xl font-bold text-white">소진율 대시보드</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">소진율 대시보드</h1>
         <p className="text-xs text-gray-400 mt-1">
           누적 소진율 = 판매량 ÷ 입고총량 &nbsp;|&nbsp; 1개월 소진율(초록) = 판매 시작 후 30일 이내 판매량 ÷ 입고총량
         </p>

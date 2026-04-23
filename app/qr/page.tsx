@@ -80,7 +80,7 @@ export default function QRPage() {
   return (
     <div>
       <div className="mb-5">
-        <h1 className="text-2xl font-bold text-white">🔴 QR 오더 대시보드</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">🔴 QR 오더 대시보드</h1>
         <p className="text-xs text-gray-400 mt-1">
           QR 필요 수량 = 시즌 마감까지 예상 판매량 − 잔여재고 &nbsp;|&nbsp; 예상 필업일 = 오늘 + 60일 (생산 리드타임)
         </p>

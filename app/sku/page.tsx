@@ -91,7 +91,7 @@ export default function SkuPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">SKU 판매 분석</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">SKU 판매 분석</h1>
         <p className="text-sm text-gray-500 mt-1">
           컬러 · 사이즈별 세부 판매량 &nbsp;|&nbsp; 기본 정렬: 최근 1개월 판매량 순
         </p>

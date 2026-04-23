@@ -70,12 +70,10 @@ function DepletionBar({ rate, rate3m }: { rate: number; rate3m: number | null })
 }
 
 function QRBadge({ reason }: { reason: string }) {
-  if (reason === "normal" || reason === "no_sales") return null;
+  if (!reason || reason === "normal" || reason === "no_sales" || reason === "soldout" || reason === "season_end") return null;
   return (
-    <span className={`inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full ${
-      reason === "30d" ? "bg-red-100 text-red-600" : "bg-orange-100 text-orange-600"
-    }`}>
-      🔴 QR {reason === "30d" ? "30일" : "7일"}
+    <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">
+      🔴 QR 필요
     </span>
   );
 }
@@ -217,7 +215,7 @@ export default function DepletionPage() {
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">카테고리</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">연도·시즌</th>
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">연도·시즌</th>
                   <th className={thClass} onClick={() => handleSort("style_code")}>스타일코드{sortIcon("style_code")}</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">스타일명</th>
                   <th className={thClass} onClick={() => handleSort("sold_1m")}>
@@ -232,7 +230,7 @@ export default function DepletionPage() {
                   <th className={thClass} onClick={() => handleSort("depletion_rate_3m")}>
                     <span className="text-emerald-600">3개월 소진율{sortIcon("depletion_rate_3m")}</span>
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">QR</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">QR</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -241,7 +239,7 @@ export default function DepletionPage() {
                     <td className="px-4 py-3">
                       <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded font-medium">{d.category}</span>
                     </td>
-                    <td className="px-4 py-3"><SeasonBadge y={d.year_code} s={d.season_code} /></td>
+                    <td className="px-2 py-3"><SeasonBadge y={d.year_code} s={d.season_code} /></td>
                     <td className="px-4 py-3 font-mono text-xs text-gray-700">{d.style_code}</td>
                     <td className="px-4 py-3 text-gray-700 max-w-64 truncate">{d.name ?? "-"}</td>
                     <td className="px-4 py-3 text-right">
@@ -278,7 +276,7 @@ export default function DepletionPage() {
                         </div>
                       ) : <span className="text-gray-300 text-xs">-</span>}
                     </td>
-                    <td className="px-4 py-3"><QRBadge reason={d.qr_reason} /></td>
+                    <td className="px-4 py-3 whitespace-nowrap"><QRBadge reason={d.qr_reason} /></td>
                   </tr>
                 ))}
               </tbody>

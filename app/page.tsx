@@ -158,7 +158,7 @@ export default function DepletionPage() {
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-white">소진율 대시보드</h1>
         <p className="text-xs text-gray-400 mt-1">
-          소진율 = 판매량 ÷ 입고총량 &nbsp;|&nbsp; 3개월 소진율(초록) = 입고 후 90일 이내 판매량 ÷ 입고총량
+          누적 소진율 = 판매량 ÷ 입고총량 &nbsp;|&nbsp; 1개월 소진율(초록) = 판매 시작 후 30일 이내 판매량 ÷ 입고총량
         </p>
       </div>
 
@@ -228,10 +228,10 @@ export default function DepletionPage() {
                   <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 whitespace-nowrap">재고수량</th>
                   <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 whitespace-nowrap">입고총량</th>
                   <th className={thClass} onClick={() => handleSort("depletion_rate")}>
-                    소진율{sortIcon("depletion_rate")}
+                    누적 소진율{sortIcon("depletion_rate")}
                   </th>
                   <th className={thClass} onClick={() => handleSort("depletion_rate_3m")}>
-                    <span className="text-emerald-600">3개월 소진율{sortIcon("depletion_rate_3m")}</span>
+                    <span className="text-emerald-600">1개월 소진율{sortIcon("depletion_rate_3m")}</span>
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">판매 상태</th>
                 </tr>

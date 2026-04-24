@@ -33,6 +33,7 @@ interface QRStyle {
   qr_reason: string;
   qr_rate_7d: number;
   qr_rate_30d: number;
+  sold_7d: number;
 }
 
 const YEAR_MAP: Record<string, string> = { A: "'21", B: "'22", C: "'23", D: "'24", E: "'25", F: "'26", G: "'26" };
@@ -157,6 +158,7 @@ export default function QRPage() {
                   <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">판매일수</th>
                   <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">일평균 판매</th>
                   <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">소진율</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-orange-400 whitespace-nowrap">7일 판매</th>
                   <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">잔여재고</th>
                   <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">시즌 마감</th>
                   <th className="px-4 py-3 text-right text-xs font-semibold text-orange-400 whitespace-nowrap">예상 필업일</th>
@@ -183,6 +185,13 @@ export default function QRPage() {
                       <td className="px-4 py-3 text-right text-gray-500">{d.days_since_first_sale}일</td>
                       <td className="px-4 py-3 text-right font-semibold text-gray-800">{d.daily_avg_sold.toFixed(1)}</td>
                       <td className="px-4 py-3 text-right font-bold text-red-500">{d.depletion_rate.toFixed(1)}%</td>
+                      <td className="px-4 py-3 text-right">
+                        <span className={d.sold_7d >= 70 ? "font-bold text-orange-600" : d.sold_7d >= 40 ? "font-semibold text-yellow-600" : "text-gray-500"}>
+                          {d.sold_7d.toLocaleString()}
+                          {d.sold_7d >= 70 && <span className="ml-1 text-xs">🔴</span>}
+                          {d.sold_7d >= 40 && d.sold_7d < 70 && <span className="ml-1 text-xs">🟡</span>}
+                        </span>
+                      </td>
                       <td className="px-4 py-3 text-right">
                         <span className={urgentStock ? "font-bold text-red-600" : "text-gray-500"}>
                           {d.total_remaining.toLocaleString()}

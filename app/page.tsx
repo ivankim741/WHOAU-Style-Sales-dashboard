@@ -80,8 +80,12 @@ function SalesBadge({ needsQr, reason }: { needsQr: boolean; reason: string }) {
     return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">품절</span>;
   if (reason === "season_end")
     return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">시즌 마감</span>;
+  if (reason === "high_velocity")
+    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">🔴 QR 필요 (판매급증)</span>;
   if (needsQr)
     return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">🔴 QR 필요</span>;
+  if (reason === "warning")
+    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">🟡 주의 (판매급증)</span>;
   return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-600">🟢 양호</span>;
 }
 

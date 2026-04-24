@@ -4,6 +4,9 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
+import Pagination from "@/components/Pagination";
+
+const PAGE_SIZE = 30;
 
 interface StyleRow {
   style_id: number;
@@ -91,6 +94,7 @@ export default function DepletionPage() {
   const [sortKey, setSortKey] = useState<SortKey>("sold_1m");
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
   const [qrOnly, setQrOnly] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     (async () => {
@@ -143,6 +147,12 @@ export default function DepletionPage() {
       return dir * (a.depletion_rate - b.depletion_rate);
     });
   }, [data, search, category, yearFilter, seasonFilter, sortKey, sortDir, qrOnly]);
+
+  // 필터 변경 시 페이지 리셋
+  useEffect(() => { setPage(1); }, [search, category, yearFilter, seasonFilter, sortKey, sortDir, qrOnly]);
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated  = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "desc" ? "asc" : "desc"));
@@ -203,7 +213,7 @@ export default function DepletionPage() {
           <input type="checkbox" checked={qrOnly} onChange={(e) => setQrOnly(e.target.checked)} className="accent-red-500" />
           QR만 보기
         </label>
-        <span className="ml-auto text-xs text-gray-400">{filtered.length}개 스타일</span>
+        <span className="ml-auto text-xs text-gray-400">{filtered.length}개 스타일 · {totalPages}페이지</span>
       </div>
 
       {/* 테이블 */}
@@ -237,7 +247,7 @@ export default function DepletionPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {filtered.map((d) => (
+                {paginated.map((d) => (
                   <tr key={d.style_id} className={`hover:bg-gray-50 transition ${d.needs_qr ? "bg-red-50/20" : ""}`}>
                     <td className="px-4 py-3">
                       <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded font-medium">{d.category}</span>
@@ -287,6 +297,14 @@ export default function DepletionPage() {
           </div>
         )}
       </div>
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        totalItems={filtered.length}
+        pageSize={PAGE_SIZE}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

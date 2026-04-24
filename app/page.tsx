@@ -50,52 +50,29 @@ function SeasonBadge({ y, s }: { y: string; s: string }) {
   );
 }
 
-function DepletionBar({ rate, rate3m }: { rate: number; rate3m: number | null }) {
-  const color = rate >= 70 ? "bg-red-500" : rate >= 40 ? "bg-amber-400" : "bg-indigo-500";
-  const textColor = rate >= 70 ? "text-red-500" : rate >= 40 ? "text-amber-500" : "text-indigo-600";
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2">
-        <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-          <div className={`h-full rounded-full ${color}`} style={{ width: `${Math.min(rate, 100)}%` }} />
-        </div>
-        <span className={`text-xs font-bold w-10 text-right ${textColor}`}>{rate.toFixed(1)}%</span>
-      </div>
-      {rate3m !== null && (
-        <div className="flex items-center gap-2">
-          <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full rounded-full bg-emerald-400" style={{ width: `${Math.min(rate3m, 100)}%` }} />
-          </div>
-          <span className="text-xs text-emerald-600 w-10 text-right">{rate3m.toFixed(1)}%</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function SalesBadge({ needsQr, reason }: { needsQr: boolean; reason: string }) {
   if (reason === "no_sales")
     return <span className="text-gray-300 text-xs">-</span>;
   if (reason === "soldout")
-    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">품절</span>;
+    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Sold Out</span>;
   if (reason === "season_end")
-    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">시즌 마감</span>;
+    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">Season End</span>;
   if (reason === "high_velocity")
-    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">🔴 QR 필요 (판매급증)</span>;
+    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">🔴 QR Needed (High Velocity)</span>;
   if (needsQr)
-    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">🔴 QR 필요</span>;
+    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">🔴 QR Needed</span>;
   if (reason === "warning")
-    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">🟡 주의 (판매급증)</span>;
-  return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-600">🟢 양호</span>;
+    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">🟡 Watch (High Velocity)</span>;
+  return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-600">🟢 Good</span>;
 }
 
 export default function DepletionPage() {
   const [data, setData] = useState<StyleRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("전체");
-  const [yearFilter, setYearFilter] = useState("전체");
-  const [seasonFilter, setSeasonFilter] = useState("전체");
+  const [category, setCategory] = useState("All");
+  const [yearFilter, setYearFilter] = useState("All");
+  const [seasonFilter, setSeasonFilter] = useState("All");
   const [sortKey, setSortKey] = useState<SortKey>("sold_1m");
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
   const [qrOnly, setQrOnly] = useState(false);
@@ -116,11 +93,11 @@ export default function DepletionPage() {
   }, []);
 
   const categories = useMemo(() =>
-    ["전체", ...[...new Set(data.map((d) => d.category).filter(Boolean))].sort()], [data]);
+    ["All", ...[...new Set(data.map((d) => d.category).filter(Boolean))].sort()], [data]);
   const years = useMemo(() =>
-    ["전체", ...[...new Set(data.map((d) => YEAR_MAP[d.year_code] ?? d.year_code))].sort()], [data]);
+    ["All", ...[...new Set(data.map((d) => YEAR_MAP[d.year_code] ?? d.year_code))].sort()], [data]);
   const seasons = useMemo(() =>
-    ["전체", ...[...new Set(data.map((d) => SEASON_MAP[d.season_code] ?? d.season_code + "Q"))].sort()], [data]);
+    ["All", ...[...new Set(data.map((d) => SEASON_MAP[d.season_code] ?? d.season_code + "Q"))].sort()], [data]);
 
   const totals = useMemo(() => ({
     sold:      data.reduce((s, d) => s + d.total_sold, 0),
@@ -133,9 +110,9 @@ export default function DepletionPage() {
   const filtered = useMemo(() => {
     const arr = data.filter((d) => {
       if (qrOnly && !d.needs_qr) return false;
-      if (category !== "전체" && d.category !== category) return false;
-      if (yearFilter !== "전체" && (YEAR_MAP[d.year_code] ?? d.year_code) !== yearFilter) return false;
-      if (seasonFilter !== "전체" && (SEASON_MAP[d.season_code] ?? d.season_code + "Q") !== seasonFilter) return false;
+      if (category !== "All" && d.category !== category) return false;
+      if (yearFilter !== "All" && (YEAR_MAP[d.year_code] ?? d.year_code) !== yearFilter) return false;
+      if (seasonFilter !== "All" && (SEASON_MAP[d.season_code] ?? d.season_code + "Q") !== seasonFilter) return false;
       if (search) {
         const q = search.toLowerCase();
         return d.style_code.toLowerCase().includes(q) || (d.name ?? "").toLowerCase().includes(q);
@@ -153,7 +130,7 @@ export default function DepletionPage() {
     });
   }, [data, search, category, yearFilter, seasonFilter, sortKey, sortDir, qrOnly]);
 
-  // 필터 변경 시 페이지 리셋
+  // Reset page on filter change
   useEffect(() => { setPage(1); }, [search, category, yearFilter, seasonFilter, sortKey, sortDir, qrOnly]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
@@ -171,20 +148,20 @@ export default function DepletionPage() {
   return (
     <div>
       <div className="mb-5">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">소진율 대시보드</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Depletion Dashboard</h1>
         <p className="text-xs text-gray-400 mt-1">
-          누적 소진율 = 판매량 ÷ 입고총량 &nbsp;|&nbsp; 1개월 소진율(초록) = 판매 시작 후 30일 이내 판매량 ÷ 입고총량
+          Cumulative Depletion = Sales ÷ Total Stock In &nbsp;|&nbsp; 1-Month Depletion (green) = Sales within 30 days of first sale ÷ Total Stock In
         </p>
       </div>
 
-      {/* 고정 요약 카드 */}
+      {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
         {[
-          { label: "총 판매량",   value: totals.sold.toLocaleString(),      unit: "건", color: "text-indigo-600" },
-          { label: "총 재고수량", value: totals.remaining.toLocaleString(), unit: "개", color: "text-amber-500"  },
-          { label: "총 입고총량", value: totals.stock.toLocaleString(),     unit: "개", color: "text-gray-700"   },
-          { label: "평균 소진율", value: totals.avgRate.toFixed(1),         unit: "%",  color: "text-emerald-600"},
-          { label: "QR 대상",    value: totals.qr.toLocaleString(),         unit: "개", color: "text-red-500"    },
+          { label: "Total Sales",     value: totals.sold.toLocaleString(),      unit: "pcs", color: "text-indigo-600" },
+          { label: "Remaining Stock", value: totals.remaining.toLocaleString(), unit: "pcs", color: "text-amber-500"  },
+          { label: "Total Stock In",  value: totals.stock.toLocaleString(),     unit: "pcs", color: "text-gray-700"   },
+          { label: "Avg Depletion",   value: totals.avgRate.toFixed(1),         unit: "%",   color: "text-emerald-600"},
+          { label: "QR Needed",       value: totals.qr.toLocaleString(),        unit: "styles", color: "text-red-500" },
         ].map((c) => (
           <div key={c.label} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
             <p className="text-xs text-gray-400 mb-1">{c.label}</p>
@@ -195,10 +172,10 @@ export default function DepletionPage() {
         ))}
       </div>
 
-      {/* 필터 */}
+      {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex flex-wrap gap-3 items-center">
         <input
-          type="text" placeholder="스타일코드 / 스타일명..." value={search}
+          type="text" placeholder="Style code / Style name..." value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-52 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition"
         />
@@ -216,39 +193,39 @@ export default function DepletionPage() {
         </select>
         <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
           <input type="checkbox" checked={qrOnly} onChange={(e) => setQrOnly(e.target.checked)} className="accent-red-500" />
-          QR만 보기
+          QR Only
         </label>
-        <span className="ml-auto text-xs text-gray-400">{filtered.length}개 스타일 · {totalPages}페이지</span>
+        <span className="ml-auto text-xs text-gray-400">{filtered.length} styles · {totalPages} pages</span>
       </div>
 
-      {/* 테이블 */}
+      {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {loading ? (
-          <div className="py-20 text-center text-gray-400 animate-pulse text-sm">데이터 불러오는 중...</div>
+          <div className="py-20 text-center text-gray-400 animate-pulse text-sm">Loading data...</div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 text-center text-gray-400 text-sm">조건에 맞는 스타일이 없습니다.</div>
+          <div className="py-20 text-center text-gray-400 text-sm">No styles match the current filters.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">카테고리</th>
-                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">연도·시즌</th>
-                  <th className={thClass} onClick={() => handleSort("style_code")}>스타일코드{sortIcon("style_code")}</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">스타일명</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">Category</th>
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">Year · Season</th>
+                  <th className={thClass} onClick={() => handleSort("style_code")}>Style Code{sortIcon("style_code")}</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">Style Name</th>
                   <th className={thClass} onClick={() => handleSort("sold_1m")}>
-                    <span className={sortKey === "sold_1m" ? "text-indigo-500" : ""}>최근 1개월{sortIcon("sold_1m")}</span>
+                    <span className={sortKey === "sold_1m" ? "text-indigo-500" : ""}>Last 1M Sales{sortIcon("sold_1m")}</span>
                   </th>
-                  <th className={thClass} onClick={() => handleSort("total_sold")}>전체 판매량{sortIcon("total_sold")}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 whitespace-nowrap">재고수량</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 whitespace-nowrap">입고총량</th>
+                  <th className={thClass} onClick={() => handleSort("total_sold")}>Total Sales{sortIcon("total_sold")}</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 whitespace-nowrap">Remaining</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 whitespace-nowrap">Stock In</th>
                   <th className={thClass} onClick={() => handleSort("depletion_rate")}>
-                    누적 소진율{sortIcon("depletion_rate")}
+                    Depletion{sortIcon("depletion_rate")}
                   </th>
                   <th className={thClass} onClick={() => handleSort("depletion_rate_3m")}>
-                    <span className="text-emerald-600">1개월 소진율{sortIcon("depletion_rate_3m")}</span>
+                    <span className="text-emerald-600">1M Depletion{sortIcon("depletion_rate_3m")}</span>
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">판매 상태</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">

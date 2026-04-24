@@ -47,7 +47,7 @@ function fmt(dateStr: string) {
 export default function QRPage() {
   const [data, setData] = useState<QRStyle[]>([]);
   const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState("전체");
+  const [category, setCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
@@ -67,10 +67,10 @@ export default function QRPage() {
   }, []);
 
   const categories = useMemo(() =>
-    ["전체", ...[...new Set(data.map((d) => d.category).filter(Boolean))].sort()], [data]);
+    ["All", ...[...new Set(data.map((d) => d.category).filter(Boolean))].sort()], [data]);
 
   const filtered = useMemo(() => data.filter((d) => {
-    if (category !== "전체" && d.category !== category) return false;
+    if (category !== "All" && d.category !== category) return false;
     if (search) {
       const q = search.toLowerCase();
       return d.style_code.toLowerCase().includes(q) || (d.name ?? "").toLowerCase().includes(q);
@@ -78,58 +78,58 @@ export default function QRPage() {
     return true;
   }), [data, search, category]);
 
-  // 필터 변경 시 페이지 리셋
+  // Reset page on filter change
   useEffect(() => { setPage(1); }, [search, category]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated  = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
 
-  const totalQrNeeded = filtered.reduce((s, d) => s + d.qr_needed_qty, 0);
-  const totalProjected = filtered.reduce((s, d) => s + d.projected_sales_remaining, 0);
+  const totalQrNeeded   = filtered.reduce((s, d) => s + d.qr_needed_qty, 0);
+  const totalProjected  = filtered.reduce((s, d) => s + d.projected_sales_remaining, 0);
   const estimatedFillDate = data[0]?.estimated_fill_date ?? "";
 
   return (
     <div>
       <div className="mb-5">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">🔴 QR 오더 대시보드</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">🔴 QR Order Dashboard</h1>
         <p className="text-xs text-gray-400 mt-1">
-          QR 필요 수량 = 시즌 마감까지 예상 판매량 − 잔여재고 &nbsp;|&nbsp; 예상 필업일 = 오늘 + 60일 (생산 리드타임)
+          QR Qty Needed = Projected Sales until Season End − Remaining Stock &nbsp;|&nbsp; Est. Fill Date = Today + 60 days (production lead time)
         </p>
       </div>
 
-      {/* 요약 카드 */}
+      {/* Summary Cards */}
       {!loading && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <div className="bg-red-50 border border-red-100 rounded-xl p-4">
-            <p className="text-xs text-red-400 mb-1">QR 대상 스타일</p>
+            <p className="text-xs text-red-400 mb-1">QR Styles</p>
             <p className="text-2xl font-bold text-red-600">
-              {filtered.length}<span className="text-sm font-normal ml-1">개</span>
+              {filtered.length}<span className="text-sm font-normal ml-1">styles</span>
             </p>
           </div>
           <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
-            <p className="text-xs text-orange-400 mb-1">예상 필업일</p>
+            <p className="text-xs text-orange-400 mb-1">Est. Fill Date</p>
             <p className="text-xl font-bold text-orange-600">{fmt(estimatedFillDate)}</p>
-            <p className="text-xs text-orange-300 mt-0.5">오늘 기준 +60일</p>
+            <p className="text-xs text-orange-300 mt-0.5">Today + 60 days</p>
           </div>
           <div className="bg-purple-50 border border-purple-100 rounded-xl p-4">
-            <p className="text-xs text-purple-400 mb-1">총 QR 필요 수량</p>
+            <p className="text-xs text-purple-400 mb-1">Total QR Qty Needed</p>
             <p className="text-2xl font-bold text-purple-600">
-              {totalQrNeeded.toLocaleString()}<span className="text-sm font-normal ml-1">개</span>
+              {totalQrNeeded.toLocaleString()}<span className="text-sm font-normal ml-1">pcs</span>
             </p>
           </div>
           <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
-            <p className="text-xs text-indigo-400 mb-1">총 앞으로 예상 판매량</p>
+            <p className="text-xs text-indigo-400 mb-1">Total Projected Sales</p>
             <p className="text-2xl font-bold text-indigo-600">
-              {totalProjected.toLocaleString()}<span className="text-sm font-normal ml-1">개</span>
+              {totalProjected.toLocaleString()}<span className="text-sm font-normal ml-1">pcs</span>
             </p>
           </div>
         </div>
       )}
 
-      {/* 필터 */}
+      {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex flex-wrap gap-3 items-center">
         <input
-          type="text" placeholder="스타일코드 / 스타일명..." value={search}
+          type="text" placeholder="Style code / Style name..." value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-56 outline-none focus:border-red-300 transition"
         />
@@ -137,33 +137,33 @@ export default function QRPage() {
           className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
           {categories.map((c) => <option key={c}>{c}</option>)}
         </select>
-        <span className="ml-auto text-xs text-gray-400">{filtered.length}개 스타일 · {totalPages}페이지</span>
+        <span className="ml-auto text-xs text-gray-400">{filtered.length} styles · {totalPages} pages</span>
       </div>
 
-      {/* 테이블 */}
+      {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {loading ? (
-          <div className="py-20 text-center text-gray-400 animate-pulse text-sm">데이터 불러오는 중...</div>
+          <div className="py-20 text-center text-gray-400 animate-pulse text-sm">Loading data...</div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 text-center text-green-500 text-sm font-medium">🎉 QR 대상 스타일이 없습니다!</div>
+          <div className="py-20 text-center text-green-500 text-sm font-medium">🎉 No styles require QR orders!</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-red-50 border-b border-red-100">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-red-400 whitespace-nowrap">카테고리</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-red-400 whitespace-nowrap">연도·시즌</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-red-400 whitespace-nowrap">스타일코드</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-red-400">스타일명</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">판매일수</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">일평균 판매</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">소진율</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-orange-400 whitespace-nowrap">7일 판매</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">잔여재고</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">시즌 마감</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-orange-400 whitespace-nowrap">예상 필업일</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-indigo-400 whitespace-nowrap">앞으로 예상 판매량</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-purple-500 whitespace-nowrap">QR 필요 수량</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-red-400 whitespace-nowrap">Category</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-red-400 whitespace-nowrap">Year · Season</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-red-400 whitespace-nowrap">Style Code</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-red-400">Style Name</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">Selling Days</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">Daily Avg</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">Depletion</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-orange-400 whitespace-nowrap">7D Sales</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">Remaining</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-red-400 whitespace-nowrap">Season End</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-orange-400 whitespace-nowrap">Est. Fill Date</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-indigo-400 whitespace-nowrap">Projected Sales</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-purple-500 whitespace-nowrap">QR Qty Needed</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -182,7 +182,7 @@ export default function QRPage() {
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-gray-700">{d.style_code}</td>
                       <td className="px-4 py-3 text-gray-700 max-w-64 truncate">{d.name ?? "-"}</td>
-                      <td className="px-4 py-3 text-right text-gray-500">{d.days_since_first_sale}일</td>
+                      <td className="px-4 py-3 text-right text-gray-500">{d.days_since_first_sale}d</td>
                       <td className="px-4 py-3 text-right font-semibold text-gray-800">{d.daily_avg_sold.toFixed(1)}</td>
                       <td className="px-4 py-3 text-right font-bold text-red-500">{d.depletion_rate.toFixed(1)}%</td>
                       <td className="px-4 py-3 text-right">
@@ -200,26 +200,26 @@ export default function QRPage() {
                       </td>
                       <td className="px-4 py-3 text-right text-gray-500 text-xs whitespace-nowrap">
                         {fmt(d.season_end_date)}
-                        <span className="block text-gray-300">({d.days_until_season_end}일 남음)</span>
+                        <span className="block text-gray-300">({d.days_until_season_end}d left)</span>
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
                         <span className="font-semibold text-orange-600 bg-orange-50 px-2 py-0.5 rounded text-xs">
                           {fmt(d.estimated_fill_date)}
                         </span>
-                        <span className="block text-xs text-gray-300 mt-0.5">판매가능 {d.sellable_days_after_fill}일</span>
+                        <span className="block text-xs text-gray-300 mt-0.5">{d.sellable_days_after_fill}d sellable</span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <span className="font-semibold text-indigo-600">
-                          {d.projected_sales_remaining.toLocaleString()}개
+                          {d.projected_sales_remaining.toLocaleString()} pcs
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         {d.qr_needed_qty > 0 ? (
                           <span className="font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded text-sm">
-                            {d.qr_needed_qty.toLocaleString()}개
+                            {d.qr_needed_qty.toLocaleString()} pcs
                           </span>
                         ) : (
-                          <span className="text-green-500 text-xs">재고 충분</span>
+                          <span className="text-green-500 text-xs">Stock OK</span>
                         )}
                       </td>
                     </tr>

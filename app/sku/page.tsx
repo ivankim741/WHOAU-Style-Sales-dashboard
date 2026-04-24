@@ -31,7 +31,7 @@ export default function SkuPage() {
   const [data, setData] = useState<SkuRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("전체");
+  const [category, setCategory] = useState("All");
   const [sortKey, setSortKey] = useState<SortKey>("sold_1m");
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
   const [page, setPage] = useState(1);
@@ -53,12 +53,12 @@ export default function SkuPage() {
 
   const categories = useMemo(() => {
     const cats = [...new Set(data.map((d) => d.category).filter(Boolean))].sort();
-    return ["전체", ...cats];
+    return ["All", ...cats];
   }, [data]);
 
   const filtered = useMemo(() => {
     const arr = data.filter((d) => {
-      if (category !== "전체" && d.category !== category) return false;
+      if (category !== "All" && d.category !== category) return false;
       if (search) {
         const q = search.toLowerCase();
         return (
@@ -78,7 +78,7 @@ export default function SkuPage() {
     });
   }, [data, search, category, sortKey, sortDir]);
 
-  // 필터 변경 시 페이지 리셋
+  // Reset page on filter change
   useEffect(() => { setPage(1); }, [search, category, sortKey, sortDir]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
@@ -101,17 +101,17 @@ export default function SkuPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">SKU 판매 분석</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">SKU Analysis</h1>
         <p className="text-sm text-gray-500 mt-1">
-          컬러 · 사이즈별 세부 판매량 &nbsp;|&nbsp; 기본 정렬: 최근 1개월 판매량 순
+          Sales breakdown by color &amp; size &nbsp;|&nbsp; Default sort: last 1-month sales
         </p>
       </div>
 
-      {/* 필터 */}
+      {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex flex-wrap gap-3 items-center">
         <input
           type="text"
-          placeholder="스타일코드 / 컬러 / 사이즈 검색..."
+          placeholder="Style code / Color / Size..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-72 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition"
@@ -123,45 +123,45 @@ export default function SkuPage() {
         >
           {categories.map((c) => <option key={c}>{c}</option>)}
         </select>
-        <span className="ml-auto text-xs text-gray-400">{filtered.length}개 SKU · {totalPages}페이지</span>
+        <span className="ml-auto text-xs text-gray-400">{filtered.length} SKUs · {totalPages} pages</span>
       </div>
 
-      {/* 테이블 */}
+      {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {loading ? (
-          <div className="py-20 text-center text-gray-400 animate-pulse text-sm">데이터 불러오는 중...</div>
+          <div className="py-20 text-center text-gray-400 animate-pulse text-sm">Loading data...</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
-                  <th className={`${thClass} text-left text-gray-500`}>카테고리</th>
-                  <th className={`${thClass} text-left text-gray-500`}>스타일코드</th>
-                  <th className={`${thClass} text-left text-gray-500`}>컬러</th>
-                  <th className={`${thClass} text-left text-gray-500`}>사이즈</th>
+                  <th className={`${thClass} text-left text-gray-500`}>Category</th>
+                  <th className={`${thClass} text-left text-gray-500`}>Style Code</th>
+                  <th className={`${thClass} text-left text-gray-500`}>Color</th>
+                  <th className={`${thClass} text-left text-gray-500`}>Size</th>
                   <th
                     className={`${thClass} text-right ${sortKey === "sold_1m" ? "text-indigo-600" : "text-gray-500"}`}
                     onClick={() => handleSort("sold_1m")}
                   >
-                    최근 1개월 판매{icon("sold_1m")}
+                    Last 1M Sales{icon("sold_1m")}
                   </th>
                   <th
                     className={`${thClass} text-right ${sortKey === "total_sold" ? "text-indigo-600" : "text-gray-500"}`}
                     onClick={() => handleSort("total_sold")}
                   >
-                    전체 판매량{icon("total_sold")}
+                    Total Sales{icon("total_sold")}
                   </th>
                   <th
                     className={`${thClass} text-right ${sortKey === "remaining_qty" ? "text-indigo-600" : "text-gray-500"}`}
                     onClick={() => handleSort("remaining_qty")}
                   >
-                    잔여재고{icon("remaining_qty")}
+                    Remaining{icon("remaining_qty")}
                   </th>
                   <th
                     className={`${thClass} text-left min-w-36 ${sortKey === "depletion_rate" ? "text-indigo-600" : "text-gray-500"}`}
                     onClick={() => handleSort("depletion_rate")}
                   >
-                    소진율{icon("depletion_rate")}
+                    Depletion{icon("depletion_rate")}
                   </th>
                 </tr>
               </thead>

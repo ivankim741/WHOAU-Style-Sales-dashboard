@@ -73,15 +73,16 @@ function DepletionBar({ rate, rate3m }: { rate: number; rate3m: number | null })
   );
 }
 
-function SalesBadge({ days, rate }: { days: number | null; rate: number }) {
-  if (days === null || days < 7) {
+function SalesBadge({ needsQr, reason }: { needsQr: boolean; reason: string }) {
+  if (reason === "no_sales")
     return <span className="text-gray-300 text-xs">-</span>;
-  }
-  const isRed    = (days >= 7  && rate >= 5)  || (days >= 14 && rate >= 10);
-  const isYellow = (days >= 7  && rate >= 4)  || (days >= 14 && rate >= 8);
-  if (isRed)    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">🔴 QR 필요</span>;
-  if (isYellow) return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">🟡 주의</span>;
-  return          <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-600">🟢 양호</span>;
+  if (reason === "soldout")
+    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">품절</span>;
+  if (reason === "season_end")
+    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">시즌 마감</span>;
+  if (needsQr)
+    return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">🔴 QR 필요</span>;
+  return <span className="inline-flex items-center whitespace-nowrap text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-600">🟢 양호</span>;
 }
 
 export default function DepletionPage() {
@@ -289,7 +290,7 @@ export default function DepletionPage() {
                         </div>
                       ) : <span className="text-gray-300 text-xs">-</span>}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap"><SalesBadge days={d.days_since_first_sale} rate={d.depletion_rate} /></td>
+                    <td className="px-4 py-3 whitespace-nowrap"><SalesBadge needsQr={d.needs_qr} reason={d.qr_reason} /></td>
                   </tr>
                 ))}
               </tbody>
